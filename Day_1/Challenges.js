@@ -203,10 +203,14 @@ const inputText = `1782
 const numbersArray = inputText.split(/\r?\n/);
 
 const checkIfSumIs2020 = (num1, num2) => (Number(num1) + Number(num2)) === 2020;
+const checkIfSumOfThreeIs2020 = (num1, num2, num3) => (Number(num1) + Number(num2) + Number(num3)) === 2020;
+
 const getNumberSumTo2020 = numbersList => {
     let pair = [];
      numbersList.forEach((num, ind) => {
         for (let index = ind; index < numbersList.length; index++) {
+            if(!num || !numbersList[index]) continue;
+
             const isSum2020 = checkIfSumIs2020(num, numbersList[index]);
             if(isSum2020) {
                 pair = [num, numbersList[index]];
@@ -216,13 +220,43 @@ const getNumberSumTo2020 = numbersList => {
     })
     return pair;
 }
+
+const getNumberSumOfThreeTo2020 = numbersList => {
+    let pairOf3 = [];
+     numbersList.forEach((num, ind) => {
+        for (let index = ind + 1; index < numbersList.length; index++) {
+            for (let index2 = index + 1; index2 < numbersList.length; index2++) {
+                if(!num || !numbersList[index] || !numbersList[index2]) continue;
+
+                const isSumOfThree2020 = checkIfSumOfThreeIs2020(num, numbersList[index], numbersList[index2]);
+                if(isSumOfThree2020) {
+                    pairOf3 = [num, numbersList[index], numbersList[index2]];
+                    break;
+                }
+            }
+        }
+    })
+    return pairOf3;
+}
+
 const getMultiplicationResult = (num1, num2) => num1 * num2;
+const getMultiplicationResultOfThree = (num1, num2, num3) => num1 * num2 * num3;
 
 const numberPair = getNumberSumTo2020(numbersArray);
+const numberTrio = getNumberSumOfThreeTo2020(numbersArray);
+
 if(numberPair.length) {
     const multiplicationResult = getMultiplicationResult(numberPair[0],numberPair[1]);
     console.log(`Pairs are ${numberPair[0]} and ${numberPair[1]}, result is: `,  multiplicationResult);
 }
 else {
     console.log("No pair found summing up to 2020.");
+}
+
+if(numberTrio.length) {
+    const multiplicationResultOfThree = getMultiplicationResultOfThree(numberTrio[0],numberTrio[1],numberTrio[2]);
+    console.log(`Trio is ${numberTrio[0]} and ${numberTrio[1]} and ${numberTrio[2]}, result is: `,  multiplicationResultOfThree);
+}
+else {
+    console.log("No trio found summing up to 2020.");
 }
