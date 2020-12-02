@@ -1011,22 +1011,33 @@ const checkPasswordValidity = (range = [], keyAlphabet = "", password = "") => {
     return (countofKeyAlphabet >= range[0] && countofKeyAlphabet <= range[1]);
 }
 
+const checkPasswordValidityWIthNewRules = (positions = [], keyAlphabet = "", password = "") => {
+    if(!positions.length || !keyAlphabet || !password) return console.log("Cannot check validity, insufficient parameters");
+
+    const charAtP1 = password[Number(positions[0]) - 1];
+    const charAtP2 = password[Number(positions[1]) - 1];
+
+    return (charAtP1 == keyAlphabet || charAtP2 == keyAlphabet) && (charAtP1 != charAtP2)
+}
+
+
 const getValidityCount = () => {
     const inputList = getInputAsArray(input);
 
     let validCount = 0;
+    let validCountNewRules = 0;
     inputList.forEach(item => {
         const inputsSeparated = item.split(" ");
         const inputRange = inputsSeparated[0].split("-")
         const keyWord = inputsSeparated[1].charAt(0);
         const inputString = inputsSeparated[2];
     
-        if (checkPasswordValidity(inputRange, keyWord, inputString)) {
-            validCount = validCount + 1;
-        }
+        if (checkPasswordValidity(inputRange, keyWord, inputString)) validCount += 1;
+        if(checkPasswordValidityWIthNewRules(inputRange, keyWord, inputString)) validCountNewRules += 1;
     })
 
-    console.log("Total valid passwords are: ", validCount);    
+    console.log("Total valid passwords (according to challenge 1) are: ", validCount);    
+    console.log("Total valid passwords (according to challenge 2) are: ", validCountNewRules);    
 }
 
 getValidityCount();
