@@ -1,18 +1,8 @@
-// const getCurrentHorizontalLine = (mapArray, positionY) => mapArray[positionY];
 const checkIfPointIsATree = point => point === "#";
 const moveRightDown = (currentPosition, slopeIncrement) => ({ x: currentPosition.x + slopeIncrement.x, y: currentPosition.y + slopeIncrement.y });
 
-const getTotalTreesCount = (traverseMapArray = [], slopeList, challenge) => {
-    // for each slope list
-    // while y < traverseMapArray.length
-    // loop over map
-    // check if tree
-    // yes ? increment tree counter
-    // no ? continue
-    // move right down
-    
+const getTotalTreesCount = (traverseMapArray = [], slopeList, challenge) => {    
     let totalTreeCount = 1;
-
     slopeList.forEach(slope => {
         let currentPosition = { x: 0, y: 0 };
         let currentHorizontalLine = traverseMapArray[currentPosition.y];
@@ -24,16 +14,12 @@ const getTotalTreesCount = (traverseMapArray = [], slopeList, challenge) => {
             currentHorizontalLine = traverseMapArray[currentPosition.y].repeat(currentPosition.y + 1);
             thisPoint = currentHorizontalLine[currentPosition.x];
             if (checkIfPointIsATree(thisPoint)) treeCount += 1;
-        }
-    
+        }    
         if(challenge === "1") return treeCount;
-
         totalTreeCount *= treeCount;
     })
-
     return totalTreeCount;
 }
-
 
 const traverseArea = `...#...#....#....##...###....#.
 #.#...#...#....#.........#..#..
@@ -368,6 +354,4 @@ const slopesList = [
 ]
 
 console.log("Trees encountered in challenge 1: ", getTotalTreesCount(traverseArea.split(/\r?\n/), [slopesList[1]]));
-
 console.log("Result of Trees encountered in challenge 2: ", getTotalTreesCount(traverseArea.split(/\r?\n/), slopesList));
-
