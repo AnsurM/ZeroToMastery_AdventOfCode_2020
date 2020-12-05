@@ -2,11 +2,10 @@ const ignorableField = "cid";
 const requiredFieldsList = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid"];
 
 const getPassportList = inputString => inputString.split(/\n\n/).map(item => item.replace("\n", " "));
-
 const checkPassportValidity = passport => {
     let isPassportValid = true;
     requiredFieldsList.forEach(reqField => {
-        if((!passport.includes(reqField)) && (reqField !== ignorableField)) isPassportValid = false;
+        if ((!passport.includes(reqField)) && (reqField !== ignorableField)) isPassportValid = false;
     })
     return isPassportValid;
 }
@@ -15,6 +14,114 @@ const getTotalValidPassportsCount = passportList => {
     let totalValidPassports = 0;
     passportList.forEach(passport => {
         totalValidPassports += Boolean(checkPassportValidity(passport));
+    })
+    return totalValidPassports;
+}
+
+// CHALLENGE 2
+
+const rulesSet = {
+    byr: { length: 4, min: 1920, max: 2002 },
+    iyr: { length: 4, min: 2010, max: 2020 },
+    eyr: { length: 4, min: 2020, max: 2030 },
+    hgt: { type: "number", followedBy: ["cm", "in"], cm: { min: 150, max: 193 }, in: { min: 59, max: 76 } },
+    hcl: { startWith: "#", length: 7, oneOf: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"] },
+    ecl: { oneOf: ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"] },
+    pid: { length: 9 },
+    cid: {},
+}
+
+const checkBirthYearValidity = birthYearValue => {
+    return (birthYearValue && birthYearValue.length == rulesSet["byr"]["length"] &&
+        birthYearValue >= rulesSet["byr"]["min"] &&
+        birthYearValue <= rulesSet["byr"]["max"])
+}
+const checkIssueYearValidity = issueYearValue => {
+    return (issueYearValue && issueYearValue.length == rulesSet["iyr"]["length"] &&
+        issueYearValue >= rulesSet["iyr"]["min"] &&
+        issueYearValue <= rulesSet["iyr"]["max"])
+}
+const checkExpiryYearValidity = expiryYearValue => {
+    return (expiryYearValue && expiryYearValue.length == 4 &&
+        expiryYearValue >= 2020 &&
+        expiryYearValue <= 2030)
+}
+const checkHeightValidity = heightValue => {
+    if(!heightValue) return false;
+
+    const ruleSet = rulesSet["hgt"];
+    const heightNumber = Number(heightValue.replace("cm", "").replace("in", ""));
+
+    if (typeof Number(heightValue.replace("cm", "").replace("in", "")) !== ruleSet.type) return false;
+    else if (ruleSet.followedBy.findIndex(item => heightValue.includes(item)) === -1) return false;
+    else if (heightValue.includes("cm") && (heightNumber < ruleSet["cm"].min || heightNumber > ruleSet["cm"].max)) return false;
+    else if (heightValue.includes("in") && (heightNumber < ruleSet["in"].min || heightNumber > ruleSet["in"].max)) return false;
+
+    return true;
+}
+const checkHairColorValidity = hairColor => {
+    if (!hairColor) return false;
+
+    const ruleSet = rulesSet["hcl"];
+
+    if (hairColor[0] !== ruleSet.startWith) return false;
+    else if (hairColor.length !== ruleSet.length) return false;
+
+    hairColor.split("#")[1].split("").forEach(character => {
+        if (!ruleSet.oneOf.includes(character)) return false;
+    })
+
+    return true;
+}
+const checkEyeColorValidity = eyeColor => eyeColor && rulesSet["ecl"].oneOf.includes(eyeColor);
+const checkPasspordIDValidity = passportID => passportID && passportID.length === rulesSet["pid"].length;
+
+const checkPassportValidityChallenge2 = (passport = "") => {
+    if (!passport || !passport.length) return false;
+
+    let isPassportValid = true;
+    let passportFields = passport.split(" ");
+    passportFields.some(field => {
+        if (field) {
+            if (field.includes("byr")) {
+                isPassportValid = checkBirthYearValidity(field.replace("byr", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+            else if (field.includes("iyr")) {
+                isPassportValid = checkIssueYearValidity(field.replace("iyr", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+            else if (field.includes("eyr")) {
+                isPassportValid = checkExpiryYearValidity(field.replace("eyr", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+            else if (field.includes("hgt")) {
+                isPassportValid = checkHeightValidity(field.replace("hgt", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+            else if (field.includes("hcl")) {
+                isPassportValid = checkHairColorValidity(field.replace("hcl", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+            else if (field.includes("ecl")) {
+                isPassportValid = checkEyeColorValidity(field.replace("ecl", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+            else if (field.includes("pid")) {
+                isPassportValid = checkPasspordIDValidity(field.replace("pid", "").replace(":", ""));
+                if(!isPassportValid) return true;
+            }
+        }
+    })
+    requiredFieldsList.forEach(reqField => {
+        if ((!passport.includes(reqField)) && (reqField !== ignorableField)) isPassportValid = false;
+    })
+    return isPassportValid;
+}
+const getTotalValidPassportsCountChallenge2 = inputPassportsList => {
+    let totalValidPassports = 0;
+    inputPassportsList.forEach((passport, index) => {
+        totalValidPassports += Boolean(checkPassportValidityChallenge2(passport.split("\n").join(" ")));
     })
     return totalValidPassports;
 }
@@ -973,5 +1080,9 @@ byr:2024 ecl:#20e25f
 iyr:1945
 eyr:1935 hgt:159cm`;
 
-let validPassportsCount = getTotalValidPassportsCount(getPassportList(passportListInput));
-console.log(`Total valid passports are: ${validPassportsCount}`);
+const passportsList = getPassportList(passportListInput);
+let validPassportsCount = getTotalValidPassportsCount(passportsList);
+console.log(`Total valid passports for challenge 1 are: ${validPassportsCount}`);
+
+let validPassportsCountChallenge2 = getTotalValidPassportsCountChallenge2(passportsList);
+console.log(`Total valid passports for challenge 2 are: ${validPassportsCountChallenge2}`);
