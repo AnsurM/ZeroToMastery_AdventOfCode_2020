@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { get } = require('http');
 const bagsRuleSet = fs.readFileSync('./BagsInfo.txt', 'utf8').split("\n");
 
 const getParentBags = (bagsList, bagsToLookFor) => {
